@@ -1,0 +1,20 @@
+LANGUAGE=Langue
+CURR=Français
+ENGLISH=Anglais
+FRENCH=Français
+SPANISH=Espagnol
+
+IP=IP du Serveur
+NAME=Nom d'utilisateur
+IDENTIFY=Identifier
+PASSWORD=Mot de Passe
+CANCEL=Annuler
+CONNECT=Relier
+CHANNEL=Canal
+JOINCHAN=Rejoindre le Canal
+PARTCHAN=Quitte le canal
+RELOAD=Reconnecter
+DEBUG=Déboguer
+ABOUT=Au Sujet de
+ABOUTMSG=Un client IRC java développé par Matthew Langlois.
+EXIT=Quitter
