@@ -12,15 +12,15 @@ import me.matt.irc.main.Configuration;
 
 /**
  * A class pertaining to images.
- * 
+ *
  * @author Matt
- * 
+ *
  */
 public class ImageUtil {
 
     /**
      * Fetches a buffered image.
-     * 
+     *
      * @param resource
      *            The resource to load as a buffered image.
      * @return The BufferedImage of the select resource.
@@ -35,7 +35,7 @@ public class ImageUtil {
 
     /**
      * Fetch a resourced image.
-     * 
+     *
      * @param resource
      *            The image to fetch.
      * @return The resource as an Image.

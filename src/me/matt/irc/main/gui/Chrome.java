@@ -15,6 +15,7 @@ import java.util.List;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.swing.SwingUtilities;
+import javax.swing.WindowConstants;
 
 import me.matt.irc.Application;
 import me.matt.irc.main.Configuration;
@@ -27,9 +28,9 @@ import me.matt.irc.main.wrappers.IRCChannel;
 
 /**
  * The main gui.
- * 
+ *
  * @author Matt
- * 
+ *
  */
 public class Chrome extends JFrame implements ActionListener {
 
@@ -38,19 +39,101 @@ public class Chrome extends JFrame implements ActionListener {
      */
     private static final long serialVersionUID = 250622357338288316L;
 
+    private ChannelToolBar channelBar;
+
+    private HomePanel home;
+
+    private List<ChannelPanel> panels;
+
     /**
      * Initlize the chrome.
      */
     public Chrome() {
-        SwingUtilities.invokeLater(new Runnable() {
-            @Override
-            public void run() {
-                new SplashScreen().display();
+        SwingUtilities.invokeLater(() -> new SplashScreen().display());
+        this.init();
+        this.pack();
+        this.setVisible(true);
+    }
+
+    /**
+     * Handle actions.
+     */
+    @Override
+    public void actionPerformed(final ActionEvent e) {
+        if (e.getActionCommand() == "add") {
+            this.addChannel();
+        } else if (e.getActionCommand().contains("remove")) {
+            final int i = Integer.valueOf(e.getActionCommand().substring(7));
+            this.removeChannel(i);
+        }
+    }
+
+    /**
+     * Add a channel.
+     */
+    private void addChannel() {
+        if (!Application.getInstance().getHandleManager().getIRCHandler()
+                .isConnected(Application.getInstance().getConnectedServer())) {
+            JOptionPane
+                    .showMessageDialog(
+                            this,
+                            "You must be fully connected to the server before attempting to connect to a channel!");
+            return;
+        }
+        new ChannelChoiceBox(channelBar);
+    }
+
+    /**
+     * Adds a panel to the list.
+     *
+     * @param p
+     *            The panel to add.
+     */
+    public void addPanel(final ChannelPanel p) {
+        panels.add(p);
+    }
+
+    /**
+     * Fetch the home panel
+     *
+     * @return The home panel.
+     */
+    public HomePanel getHome() {
+        return home;
+    }
+
+    /**
+     * Fetch a panel.
+     *
+     * @param idx
+     *            The index of the panel.
+     * @return The panel.
+     */
+    public ChannelPanel getPanel(final int idx) {
+        for (final ChannelPanel c : panels) {
+            if (c.getIndex() == idx) {
+                return c;
             }
-        });
-        init();
-        pack();
-        setVisible(true);
+        }
+        return null;
+    }
+
+    /**
+     * Fetches all of the panels in a list
+     *
+     * @return The panels in a list.
+     */
+    public List<ChannelPanel> getPanels() {
+        return panels;
+    }
+
+    /**
+     * Fetch the toolbar.
+     *
+     * @return The channel toolbar.
+     */
+    public ChannelToolBar getToolbar() {
+        return channelBar;
     }
 
     /**
@@ -61,22 +144,23 @@ public class Chrome extends JFrame implements ActionListener {
         channelBar = new ChannelToolBar(this);
         home = new HomePanel(this);
 
-        setTitle("JIRC - A java irc client");
-        setIconImage(ImageUtil.getImage(Configuration.Paths.Resources.ICON));
-        setResizable(false);
+        this.setTitle("JIRC - A java irc client");
+        this.setIconImage(ImageUtil
+                .getImage(Configuration.Paths.Resources.ICON));
+        this.setResizable(false);
 
         channelBar.setBounds(5, 0, 730, 22);
         home.setBounds(5, 25, 730, 545);
 
-        setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
-        addWindowListener(new WindowAdapter() {
+        this.setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
+        this.addWindowListener(new WindowAdapter() {
             @Override
             public void windowClosing(final WindowEvent e) {
                 Application.getInstance().disable();
             }
         });
 
-        addComponentListener(new ComponentListener() {
+        this.addComponentListener(new ComponentListener() {
 
             @Override
             public void componentHidden(final ComponentEvent arg0) {
@@ -103,133 +187,24 @@ public class Chrome extends JFrame implements ActionListener {
             }
         });
 
-        add(channelBar, BorderLayout.NORTH);
-        add(home, BorderLayout.CENTER);
+        this.add(channelBar, BorderLayout.NORTH);
+        this.add(home, BorderLayout.CENTER);
 
-        setPreferredSize(new Dimension(725, 570));
-        setSize(725, 570);
-        setLocationRelativeTo(getOwner());
-    }
-
-    private ChannelToolBar channelBar;
-    private HomePanel home;
-    private List<ChannelPanel> panels;
-
-    /**
-     * Handle actions.
-     */
-    @Override
-    public void actionPerformed(final ActionEvent e) {
-        if (e.getActionCommand() == "add") {
-            addChannel();
-        } else if (e.getActionCommand().contains("remove")) {
-            final int i = Integer.valueOf(e.getActionCommand().substring(7));
-            removeChannel(i);
-        }
-    }
-
-    /**
-     * Set the specific panel visible.
-     * 
-     * @param panel
-     *            The panel to set visible.
-     */
-    public void setVisible(final int panel) {
-        for (final ChannelPanel c : panels) {
-            c.setVisible(false);
-        }
-        home.setVisible(false);
-        if (panel == 0) {
-            home.setVisible(true);
-            return;
-        }
-        getPanel(panel).setVisible(true);
-    }
-
-    /**
-     * Fetch the home panel
-     * 
-     * @return The home panel.
-     */
-    public HomePanel getHome() {
-        return home;
-    }
-
-    /**
-     * Fetches all of the panels in a list
-     * 
-     * @return The panels in a list.
-     */
-    public List<ChannelPanel> getPanels() {
-        return panels;
-    }
-
-    /**
-     * Fetch a panel.
-     * 
-     * @param idx
-     *            The index of the panel.
-     * @return The panel.
-     */
-    public ChannelPanel getPanel(final int idx) {
-        for (final ChannelPanel c : panels) {
-            if (c.getIndex() == idx) {
-                return c;
-            }
-        }
-        return null;
-    }
-
-    /**
-     * Adds a panel to the list.
-     * 
-     * @param p
-     *            The panel to add.
-     */
-    public void addPanel(final ChannelPanel p) {
-        panels.add(p);
-    }
-
-    /**
-     * Removes a panel from the list.
-     * 
-     * @param p
-     *            The panel to remove from the list.
-     */
-    public void removePanel(final ChannelPanel p) {
-        if (p != null) {
-            panels.remove(p);
-            remove(p);
-            validate();
-            repaint();
-        }
-    }
-
-    /**
-     * Add a channel.
-     */
-    private void addChannel() {
-        if (!Application.getInstance().getHandleManager().getIRCHandler()
-                .isConnected(Application.getInstance().getConnectedServer())) {
-            JOptionPane
-                    .showMessageDialog(
-                            this,
-                            "You must be fully connected to the server before attempting to connect to a channel!");
-            return;
-        }
-        new ChannelChoiceBox(channelBar);
+        this.setPreferredSize(new Dimension(725, 570));
+        this.setSize(725, 570);
+        this.setLocationRelativeTo(this.getOwner());
     }
 
     /**
      * Remove a channel.
-     * 
+     *
      * @param tab
      *            The tab of the channel to remove.
      */
     private void removeChannel(final int tab) {
         final int channelIndex = tab + 1;
-        final ChannelPanel p = getPanel(channelIndex);
-        for (final ChannelPanel cp : getPanels()) {
+        final ChannelPanel p = this.getPanel(channelIndex);
+        for (final ChannelPanel cp : this.getPanels()) {
             if (cp.getIndex() > channelIndex) {
                 cp.setIndex(cp.getIndex() - 1);
             }
@@ -242,16 +217,40 @@ public class Chrome extends JFrame implements ActionListener {
                 break;
             }
         }
-        removePanel(p);
+        this.removePanel(p);
         channelBar.removeTab(tab);
     }
 
     /**
-     * Fetch the toolbar.
-     * 
-     * @return The channel toolbar.
+     * Removes a panel from the list.
+     *
+     * @param p
+     *            The panel to remove from the list.
      */
-    public ChannelToolBar getToolbar() {
-        return channelBar;
+    public void removePanel(final ChannelPanel p) {
+        if (p != null) {
+            panels.remove(p);
+            this.remove(p);
+            this.validate();
+            this.repaint();
+        }
+    }
+
+    /**
+     * Set the specific panel visible.
+     *
+     * @param panel
+     *            The panel to set visible.
+     */
+    public void setVisible(final int panel) {
+        for (final ChannelPanel c : panels) {
+            c.setVisible(false);
+        }
+        home.setVisible(false);
+        if (panel == 0) {
+            home.setVisible(true);
+            return;
+        }
+        this.getPanel(panel).setVisible(true);
     }
 }

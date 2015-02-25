@@ -7,9 +7,9 @@ import me.matt.irc.main.gui.handlers.AutoScrollHandler;
 
 /**
  * Create a component that will automatically scroll down.
- * 
+ *
  * @author matthewlanglois
- * 
+ *
  */
 public class AutoScrollPane extends JScrollPane {
 
@@ -20,7 +20,7 @@ public class AutoScrollPane extends JScrollPane {
 
     /**
      * Create a textpane that autoscrolls
-     * 
+     *
      * @param parent
      *            The pane to scroll.
      */

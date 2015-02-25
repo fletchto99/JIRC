@@ -11,11 +11,55 @@ import me.matt.irc.main.util.io.IniParser;
 
 /**
  * A class containing all of the messages used within the program.
- * 
+ *
  * @author matthewlanglois
- * 
+ *
  */
 public class Messages {
+    // Reset all of the variables
+    /**
+     * Set the currently running language on the program.
+     *
+     * @param lang
+     *            The language to set.
+     */
+    public static void setLanguage(final Language lang) {
+        try {
+            final URL src = Configuration
+                    .getResourceURL(Configuration.Paths.Resources.MESSAGES
+                            + lang.getName() + ".txt");
+            Messages.map.clear();
+            Messages.map = IniParser.deserialise(src.openStream()).get(
+                    IniParser.emptySection);
+            final HashMap<String, String> mapNative = IniParser.deserialise(
+                    src.openStream()).get(IniParser.emptySection);
+            for (final Entry<String, String> entry : mapNative.entrySet()) {
+                Messages.map.put(entry.getKey(), entry.getValue());
+            }
+        } catch (final IOException e) {
+        }
+        Messages.LANGUAGE = Messages.map.get("LANGUAGE");
+        Messages.CURR = Messages.map.get("CURR");
+        Messages.ENGLISH = Messages.map.get("ENGLISH");
+        Messages.FRENCH = Messages.map.get("FRENCH");
+        Messages.SPANISH = Messages.map.get("SPANISH");
+
+        Messages.IP = Messages.map.get("IP");
+        Messages.NAME = Messages.map.get("NAME");
+        Messages.IDENTIFY = Messages.map.get("IDENTIFY");
+        Messages.PASSWORD = Messages.map.get("PASSWORD");
+        Messages.CANCEL = Messages.map.get("CANCEL");
+        Messages.CONNECT = Messages.map.get("CONNECT");
+        Messages.CHANNEL = Messages.map.get("CHANNEL");
+        Messages.JOINCHANNEL = Messages.map.get("JOINCHAN");
+        Messages.PARTCHANNEL = Messages.map.get("PARTCHAN");
+        Messages.RELOAD = Messages.map.get("RELOAD");
+        Messages.DEBUG = Messages.map.get("DEBUG");
+        Messages.ABOUT = Messages.map.get("ABOUT");
+        Messages.ABOUT_MESSAGE = Messages.map.get("ABOUTMSG");
+        Messages.EXIT = Messages.map.get("EXIT");
+    }
+
     private static HashMap<String, String> map;
 
     /**
@@ -30,7 +74,7 @@ public class Messages {
             URL src = Configuration
                     .getResourceURL(Configuration.Paths.Resources.MESSAGES
                             + defaultLang + ".txt");
-            map = IniParser.deserialise(src.openStream()).get(
+            Messages.map = IniParser.deserialise(src.openStream()).get(
                     IniParser.emptySection);
             if (!lang.startsWith(defaultLang)) {
                 for (final String avail : new String[] { "fr" }) {
@@ -43,7 +87,7 @@ public class Messages {
                                         IniParser.emptySection);
                         for (final Entry<String, String> entry : mapNative
                                 .entrySet()) {
-                            map.put(entry.getKey(), entry.getValue());
+                            Messages.map.put(entry.getKey(), entry.getValue());
                         }
                         break;
                     }
@@ -54,69 +98,25 @@ public class Messages {
         }
     }
 
-    // Reset all of the variables
-    /**
-     * Set the currently running language on the program.
-     * 
-     * @param lang
-     *            The language to set.
-     */
-    public static void setLanguage(final Language lang) {
-        try {
-            final URL src = Configuration
-                    .getResourceURL(Configuration.Paths.Resources.MESSAGES
-                            + lang.getName() + ".txt");
-            map.clear();
-            map = IniParser.deserialise(src.openStream()).get(
-                    IniParser.emptySection);
-            final HashMap<String, String> mapNative = IniParser.deserialise(
-                    src.openStream()).get(IniParser.emptySection);
-            for (final Entry<String, String> entry : mapNative.entrySet()) {
-                map.put(entry.getKey(), entry.getValue());
-            }
-        } catch (final IOException e) {
-        }
-        LANGUAGE = map.get("LANGUAGE");
-        CURR = map.get("CURR");
-        ENGLISH = map.get("ENGLISH");
-        FRENCH = map.get("FRENCH");
-        SPANISH = map.get("SPANISH");
+    public static String LANGUAGE = Messages.map.get("LANGUAGE");
+    public static String CURR = Messages.map.get("CURR");
+    public static String ENGLISH = Messages.map.get("ENGLISH");
+    public static String FRENCH = Messages.map.get("FRENCH");
+    public static String SPANISH = Messages.map.get("SPANISH");
 
-        IP = map.get("IP");
-        NAME = map.get("NAME");
-        IDENTIFY = map.get("IDENTIFY");
-        PASSWORD = map.get("PASSWORD");
-        CANCEL = map.get("CANCEL");
-        CONNECT = map.get("CONNECT");
-        CHANNEL = map.get("CHANNEL");
-        JOINCHANNEL = map.get("JOINCHAN");
-        PARTCHANNEL = map.get("PARTCHAN");
-        RELOAD = map.get("RELOAD");
-        DEBUG = map.get("DEBUG");
-        ABOUT = map.get("ABOUT");
-        ABOUT_MESSAGE = map.get("ABOUTMSG");
-        EXIT = map.get("EXIT");
-    }
-
-    public static String LANGUAGE = map.get("LANGUAGE");
-    public static String CURR = map.get("CURR");
-    public static String ENGLISH = map.get("ENGLISH");
-    public static String FRENCH = map.get("FRENCH");
-    public static String SPANISH = map.get("SPANISH");
-
-    public static String IP = map.get("IP");
-    public static String NAME = map.get("NAME");
-    public static String IDENTIFY = map.get("IDENTIFY");
-    public static String PASSWORD = map.get("PASSWORD");
-    public static String CANCEL = map.get("CANCEL");
-    public static String CONNECT = map.get("CONNECT");
-    public static String CHANNEL = map.get("CHANNEL");
-    public static String JOINCHANNEL = map.get("JOINCHAN");
-    public static String PARTCHANNEL = map.get("PARTCHAN");
-    public static String RELOAD = map.get("RELOAD");
-    public static String DEBUG = map.get("DEBUG");
-    public static String ABOUT = map.get("ABOUT");
-    public static String ABOUT_MESSAGE = map.get("ABOUTMSG");
-    public static String EXIT = map.get("EXIT");
+    public static String IP = Messages.map.get("IP");
+    public static String NAME = Messages.map.get("NAME");
+    public static String IDENTIFY = Messages.map.get("IDENTIFY");
+    public static String PASSWORD = Messages.map.get("PASSWORD");
+    public static String CANCEL = Messages.map.get("CANCEL");
+    public static String CONNECT = Messages.map.get("CONNECT");
+    public static String CHANNEL = Messages.map.get("CHANNEL");
+    public static String JOINCHANNEL = Messages.map.get("JOINCHAN");
+    public static String PARTCHANNEL = Messages.map.get("PARTCHAN");
+    public static String RELOAD = Messages.map.get("RELOAD");
+    public static String DEBUG = Messages.map.get("DEBUG");
+    public static String ABOUT = Messages.map.get("ABOUT");
+    public static String ABOUT_MESSAGE = Messages.map.get("ABOUTMSG");
+    public static String EXIT = Messages.map.get("EXIT");
 
 }

@@ -4,9 +4,9 @@ import java.awt.Color;
 
 /**
  * An enum containing all of the Effects used within IRC protocall
- * 
+ *
  * @author Matt
- * 
+ *
  */
 public enum IRCModifier {
 
@@ -24,10 +24,16 @@ public enum IRCModifier {
             238)), DARK_GRAY("\u000314", "14", Color.DARK_GRAY), LIGHT_GRAY(
             "\u000315", "15", Color.LIGHT_GRAY);
 
+    private final Object effect;
+
+    private final String modifier;
+
+    private final String code;
+
     IRCModifier(final String modifier, final Object effect) {
         this.modifier = modifier;
         this.effect = effect;
-        this.code = "";
+        code = "";
     }
 
     IRCModifier(final String modifier, final String code, final Object effect) {
@@ -37,17 +43,8 @@ public enum IRCModifier {
     }
 
     /**
-     * Fetch the IRC modifier used within the IRC protocall.
-     * 
-     * @return The modifier to send to the server.
-     */
-    public String getModifier() {
-        return modifier;
-    }
-
-    /**
      * The 2 digit code representing the effect.
-     * 
+     *
      * @return The code that represents the effect.
      */
     public String getCode() {
@@ -56,16 +53,19 @@ public enum IRCModifier {
 
     /**
      * The effect to apply.
-     * 
+     *
      * @return The effect.
      */
     public Object getEffect() {
         return effect;
     }
 
-    private final Object effect;
-
-    private final String modifier;
-
-    private final String code;
+    /**
+     * Fetch the IRC modifier used within the IRC protocall.
+     *
+     * @return The modifier to send to the server.
+     */
+    public String getModifier() {
+        return modifier;
+    }
 }

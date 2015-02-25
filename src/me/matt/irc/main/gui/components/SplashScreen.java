@@ -13,6 +13,7 @@ import java.util.TimerTask;
 import javax.swing.ImageIcon;
 import javax.swing.JDialog;
 import javax.swing.JLabel;
+import javax.swing.WindowConstants;
 
 import me.matt.irc.main.Configuration;
 import me.matt.irc.main.util.ImageUtil;
@@ -21,7 +22,7 @@ import me.matt.irc.main.util.io.HttpClient;
 
 /**
  * A class that creates a splash sceen.
- * 
+ *
  * @author matthewlanglois
  */
 public class SplashScreen extends JDialog implements MouseListener {
@@ -42,7 +43,7 @@ public class SplashScreen extends JDialog implements MouseListener {
                     .getBufferedImage(Configuration.Paths.Resources.LOGO);
         } catch (final IOException e) {
             Methods.debug(e);
-            dispose();
+            this.dispose();
         }
         final Dimension screen = Toolkit.getDefaultToolkit().getScreenSize();
         final int x = (screen.width / 2) - (splash.getWidth() / 2);
@@ -52,16 +53,16 @@ public class SplashScreen extends JDialog implements MouseListener {
         this.setLocation(x, y);
         this.setUndecorated(true);
         this.setAlwaysOnTop(true);
-        this.setDefaultCloseOperation(DISPOSE_ON_CLOSE);
+        this.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
         this.setTitle("Logo");
         this.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
         this.setSize(splash.getWidth(), splash.getHeight());
         final JLabel label = new JLabel();
         label.setIcon(new ImageIcon(splash));
-        add(label);
-        pack();
-        addMouseListener(this);
-        setVisible(true);
+        this.add(label);
+        this.pack();
+        this.addMouseListener(this);
+        this.setVisible(true);
         JDialog.setDefaultLookAndFeelDecorated(true);
     }
 
@@ -72,24 +73,29 @@ public class SplashScreen extends JDialog implements MouseListener {
         new Timer().schedule(new TimerTask() {
             @Override
             public void run() {
-                dispose();
+                SplashScreen.this.dispose();
             }
         }, display);
     }
 
+    @Override
     public void mouseClicked(final MouseEvent e) {
     }
 
-    public void mousePressed(final MouseEvent e) {
-    }
-
-    public void mouseReleased(final MouseEvent e) {
-        HttpClient.openURL(Configuration.Paths.URLs.WEBSITE);
-    }
-
+    @Override
     public void mouseEntered(final MouseEvent e) {
     }
 
+    @Override
     public void mouseExited(final MouseEvent e) {
+    }
+
+    @Override
+    public void mousePressed(final MouseEvent e) {
+    }
+
+    @Override
+    public void mouseReleased(final MouseEvent e) {
+        HttpClient.openURL(Configuration.Paths.URLs.WEBSITE);
     }
 }

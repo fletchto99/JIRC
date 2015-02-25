@@ -7,7 +7,6 @@ import java.awt.Font;
 import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 
@@ -17,6 +16,7 @@ import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPasswordField;
 import javax.swing.JTextField;
+import javax.swing.WindowConstants;
 
 import me.matt.irc.Application;
 import me.matt.irc.main.Configuration;
@@ -27,8 +27,37 @@ public class ServerBox extends JFrame {
 
     private static final long serialVersionUID = 2053636315187421222L;
 
+    // variables
+    private JLabel titleLable;
+
+    private JButton connectButton;
+
+    private JButton cancelButton;
+
+    private JTextField serverIPBox;
+
+    private JLabel ipLabel;
+
+    private JLabel nameLabel;
+    private JTextField userBox;
+    private JCheckBox identCheck;
+    private JPasswordField passBox;
+    private JLabel passLabel;
+
     public ServerBox() {
-        initComponents();
+        this.initComponents();
+    }
+
+    private void button1ActionPerformed(final ActionEvent e) {
+        Application.getInstance().setup(userBox.getText(),
+                passBox.getPassword().toString(), serverIPBox.getText(),
+                identCheck.isSelected());
+        this.dispose();
+    }
+
+    private void cancelAction(final ActionEvent e) {
+        this.setVisible(false);
+        System.exit(0);
     }
 
     private void identBoxChecked(final ActionEvent e) {
@@ -39,23 +68,12 @@ public class ServerBox extends JFrame {
         }
     }
 
-    private void cancelAction(final ActionEvent e) {
-        this.setVisible(false);
-        System.exit(0);
-    }
-
-    private void button1ActionPerformed(final ActionEvent e) {
-        Application.getInstance().setup(userBox.getText(),
-                passBox.getPassword().toString(), serverIPBox.getText(),
-                identCheck.isSelected());
-        dispose();
-    }
-
     /**
      * Set up and add all of the components to the frame.
      */
     private void initComponents() {
-        setIconImage(ImageUtil.getImage(Configuration.Paths.Resources.ICON));
+        this.setIconImage(ImageUtil
+                .getImage(Configuration.Paths.Resources.ICON));
         titleLable = new JLabel();
         connectButton = new JButton();
         cancelButton = new JButton();
@@ -67,16 +85,16 @@ public class ServerBox extends JFrame {
         passBox = new JPasswordField();
         passLabel = new JLabel();
 
-        setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
-        addWindowListener(new WindowAdapter() {
+        this.setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
+        this.addWindowListener(new WindowAdapter() {
             @Override
             public void windowClosing(final WindowEvent e) {
                 System.exit(1);
             }
         });
 
-        setTitle(Configuration.NAME);
-        final Container contentPane = getContentPane();
+        this.setTitle(Configuration.NAME);
+        final Container contentPane = this.getContentPane();
         contentPane.setLayout(null);
         this.setResizable(false);
 
@@ -87,22 +105,13 @@ public class ServerBox extends JFrame {
         titleLable.setBounds(120, 5, 145, 65);
 
         connectButton.setText(Messages.CONNECT);
-        connectButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(final ActionEvent e) {
-                button1ActionPerformed(e);
-            }
-        });
+        connectButton.addActionListener(e -> ServerBox.this
+                .button1ActionPerformed(e));
         contentPane.add(connectButton);
         connectButton.setBounds(220, 200, 105, 45);
 
         cancelButton.setText(Messages.CANCEL);
-        cancelButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(final ActionEvent e) {
-                cancelAction(e);
-            }
-        });
+        cancelButton.addActionListener(e -> ServerBox.this.cancelAction(e));
         contentPane.add(cancelButton);
         cancelButton.setBounds(55, 200, 105, 45);
         contentPane.add(serverIPBox);
@@ -120,12 +129,7 @@ public class ServerBox extends JFrame {
         userBox.setBounds(140, 100, 175, userBox.getPreferredSize().height);
 
         identCheck.setText(Messages.IDENTIFY);
-        identCheck.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(final ActionEvent e) {
-                identBoxChecked(e);
-            }
-        });
+        identCheck.addActionListener(e -> ServerBox.this.identBoxChecked(e));
         contentPane.add(identCheck);
         identCheck.setBounds(new Rectangle(new Point(165, 130), identCheck
                 .getPreferredSize()));
@@ -142,19 +146,7 @@ public class ServerBox extends JFrame {
         userBox.setText("test");
 
         contentPane.setPreferredSize(new Dimension(400, 300));
-        pack();
-        setLocationRelativeTo(getOwner());
+        this.pack();
+        this.setLocationRelativeTo(this.getOwner());
     }
-
-    // variables
-    private JLabel titleLable;
-    private JButton connectButton;
-    private JButton cancelButton;
-    private JTextField serverIPBox;
-    private JLabel ipLabel;
-    private JLabel nameLabel;
-    private JTextField userBox;
-    private JCheckBox identCheck;
-    private JPasswordField passBox;
-    private JLabel passLabel;
 }

@@ -20,8 +20,33 @@ import me.matt.irc.main.util.StringUtil;
 public class IOHelper {
 
     /**
+     * Copys and input stream to a buffer then saves it to an output stream.
+     *
+     * @param in
+     *            The input stream to read from
+     * @param out
+     *            The outputsream to write to.
+     * @throws IOException
+     *             Exception in the input stream.
+     */
+    private final static void copyInputStream(final InputStream in,
+            final OutputStream out) throws IOException {
+        try {
+            final byte[] buff = new byte[4096];
+            int n;
+            while ((n = in.read(buff)) > 0) {
+                out.write(buff, 0, n);
+            }
+        } finally {
+            out.flush();
+            out.close();
+            in.close();
+        }
+    }
+
+    /**
      * Extract files from within the running jar.
-     * 
+     *
      * @param fileName
      *            The file to extract.
      * @param dest
@@ -61,7 +86,7 @@ public class IOHelper {
                         jar.getInputStream(je));
                 final OutputStream out = new BufferedOutputStream(
                         new FileOutputStream(file));
-                copyInputStream(in, out);// copy the buffer and save the file
+                IOHelper.copyInputStream(in, out);// copy the buffer and save the file
                 jar.close();
                 return true;
             }
@@ -74,33 +99,8 @@ public class IOHelper {
     }
 
     /**
-     * Copys and input stream to a buffer then saves it to an output stream.
-     * 
-     * @param in
-     *            The input stream to read from
-     * @param out
-     *            The outputsream to write to.
-     * @throws IOException
-     *             Exception in the input stream.
-     */
-    private final static void copyInputStream(final InputStream in,
-            final OutputStream out) throws IOException {
-        try {
-            final byte[] buff = new byte[4096];
-            int n;
-            while ((n = in.read(buff)) > 0) {
-                out.write(buff, 0, n);
-            }
-        } finally {
-            out.flush();
-            out.close();
-            in.close();
-        }
-    }
-
-    /**
      * Read the bytes from an input stream.
-     * 
+     *
      * @param is
      *            The inputstream to read from.
      * @return The bytes of the open stream.
@@ -132,14 +132,14 @@ public class IOHelper {
 
     /**
      * Read the bytes from a url's stream.
-     * 
+     *
      * @param in
      *            The url to open the stream on.
      * @return The bytes read.
      */
     public static byte[] read(final URL in) {
         try {
-            return read(in.openStream());
+            return IOHelper.read(in.openStream());
         } catch (final IOException ignored) {
             return null;
         }
@@ -147,12 +147,12 @@ public class IOHelper {
 
     /**
      * Reads a string's bytes.
-     * 
+     *
      * @param in
      *            The url to read from.
      * @return The text on te page.
      */
     public static String readString(final URL in) {
-        return StringUtil.newStringUtf8(read(in));
+        return StringUtil.newStringUtf8(IOHelper.read(in));
     }
 }

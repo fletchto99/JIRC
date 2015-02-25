@@ -9,9 +9,9 @@ import javax.swing.JLabel;
 
 /**
  * This class is used to log to a JLabel.
- * 
+ *
  * @author matthewlanglois
- * 
+ *
  */
 public class LabelLogHandler extends Handler {
 
@@ -39,7 +39,7 @@ public class LabelLogHandler extends Handler {
 
     /**
      * Publish the log record
-     * 
+     *
      * @param record
      *            The record to log.
      */

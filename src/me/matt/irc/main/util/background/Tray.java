@@ -20,7 +20,7 @@ import me.matt.irc.main.util.ImageUtil;
 
 /**
  * A class which creates the tray icon in the system tray.
- * 
+ *
  * @author matthewlanglois
  */
 public class Tray {
@@ -47,7 +47,49 @@ public class Tray {
      * Sets up the system tray.
      */
     public Tray() {
-        add(sysTray);
+        this.add(Tray.sysTray);
+    }
+
+    /**
+     * Adds an icon to the system tray.
+     *
+     * @param icon
+     *            The icon to add.
+     */
+    public void add(final TrayIcon icon) {
+        if (SystemTray.isSupported()) {
+            try {
+                tray.add(icon);
+            } catch (final Exception e) {
+            }
+        }
+    }
+
+    /**
+     * Displays a notification for the user to see.
+     *
+     * @param caption
+     *            The title of the message.
+     * @param text
+     *            The text to display.
+     * @param type
+     *            The message type.
+     */
+    public void notify(final String caption, final String text,
+            final MessageType type) {
+        Tray.sysTray.displayMessage(caption, text, type);
+    }
+
+    /**
+     * Removes the icon from the system tray.
+     */
+    public void remove() {
+        if (SystemTray.isSupported()) {
+            try {
+                tray.remove(Tray.sysTray);
+            } catch (final Exception e) {
+            }
+        }
     }
 
     /**
@@ -75,18 +117,9 @@ public class Tray {
         final MenuItem about = new MenuItem(Messages.ABOUT);
 
         final MenuItem exit = new MenuItem(Messages.EXIT);
-        exit.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(final ActionEvent e) {
-                Application.getInstance().disable();
-            }
-        });
-        about.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(final ActionEvent e) {
-                JOptionPane.showMessageDialog(null, Messages.ABOUT_MESSAGE);
-            }
-        });
+        exit.addActionListener(e -> Application.getInstance().disable());
+        about.addActionListener(e -> JOptionPane.showMessageDialog(null,
+                Messages.ABOUT_MESSAGE));
         add.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(final ActionEvent e) {
@@ -112,45 +145,27 @@ public class Tray {
                                                 .getToolbar().getCurrentTab()));
             }
         });
-        debug.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(final ActionEvent e) {
-                if (!LoadScreen.getDebugger().isVisible()) {
-                    LoadScreen.getDebugger().setVisible(true);
-                } else {
-                    LoadScreen.getDebugger().setVisible(true);
-                }
+        debug.addActionListener(e -> {
+            if (!LoadScreen.getDebugger().isVisible()) {
+                LoadScreen.getDebugger().setVisible(true);
+            } else {
+                LoadScreen.getDebugger().setVisible(true);
             }
         });
 
-        eng.addActionListener(new ActionListener() {
-
-            @Override
-            public void actionPerformed(final ActionEvent arg0) {
-                Messages.setLanguage(Language.ENGLISH);
-                Application.getInstance().getTray().update();
-            }
-
+        eng.addActionListener(arg0 -> {
+            Messages.setLanguage(Language.ENGLISH);
+            Application.getInstance().getTray().update();
         });
 
-        fr.addActionListener(new ActionListener() {
-
-            @Override
-            public void actionPerformed(final ActionEvent arg0) {
-                Messages.setLanguage(Language.FRENCH);
-                Application.getInstance().getTray().update();
-            }
-
+        fr.addActionListener(arg0 -> {
+            Messages.setLanguage(Language.FRENCH);
+            Application.getInstance().getTray().update();
         });
 
-        sp.addActionListener(new ActionListener() {
-
-            @Override
-            public void actionPerformed(final ActionEvent arg0) {
-                Messages.setLanguage(Language.SPANISH);
-                Application.getInstance().getTray().update();
-            }
-
+        sp.addActionListener(arg0 -> {
+            Messages.setLanguage(Language.SPANISH);
+            Application.getInstance().getTray().update();
         });
 
         if (eng.getLabel().equalsIgnoreCase(Messages.CURR)) {
@@ -186,48 +201,6 @@ public class Tray {
         menu.add(about);
         menu.addSeparator();
         menu.add(exit);
-        sysTray.setPopupMenu(menu);
-    }
-
-    /**
-     * Adds an icon to the system tray.
-     * 
-     * @param icon
-     *            The icon to add.
-     */
-    public void add(final TrayIcon icon) {
-        if (SystemTray.isSupported()) {
-            try {
-                tray.add(icon);
-            } catch (final Exception e) {
-            }
-        }
-    }
-
-    /**
-     * Removes the icon from the system tray.
-     */
-    public void remove() {
-        if (SystemTray.isSupported()) {
-            try {
-                tray.remove(sysTray);
-            } catch (final Exception e) {
-            }
-        }
-    }
-
-    /**
-     * Displays a notification for the user to see.
-     * 
-     * @param caption
-     *            The title of the message.
-     * @param text
-     *            The text to display.
-     * @param type
-     *            The message type.
-     */
-    public void notify(final String caption, final String text,
-            final MessageType type) {
-        sysTray.displayMessage(caption, text, type);
+        Tray.sysTray.setPopupMenu(menu);
     }
 }

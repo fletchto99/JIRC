@@ -4,15 +4,15 @@ import me.matt.irc.main.wrappers.IRCChannel;
 
 /**
  * This class is the Abstract Game command.
- * 
+ *
  * @author matthewlanglois
- * 
+ *
  */
 public abstract class IRCCommand {
 
     /**
      * Checks if the command can be executed by the certian user.
-     * 
+     *
      * @param sender
      *            The command sender.
      * @param msg
@@ -24,7 +24,7 @@ public abstract class IRCCommand {
 
     /**
      * The action to perfrom when executing the command.
-     * 
+     *
      * @param sender
      *            The command sender.
      * @param msg

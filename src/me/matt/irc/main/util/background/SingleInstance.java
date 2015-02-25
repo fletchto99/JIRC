@@ -8,9 +8,9 @@ import java.nio.channels.OverlappingFileLockException;
 
 /**
  * Check to see if another instance of the program is running using LOCK files.
- * 
+ *
  * @author matthewlanglois
- * 
+ *
  */
 public class SingleInstance {
 
@@ -21,50 +21,12 @@ public class SingleInstance {
 
     /**
      * Create an instance of the class.
-     * 
+     *
      * @param appName
      *            The application the check for
      */
     public SingleInstance(final String appName) {
         this.appName = appName;
-    }
-
-    /**
-     * Check if the application is running with an instance of this class.
-     * 
-     * @return True if the application is running; otherwise false.
-     */
-    public boolean isAppActive() {
-        try {
-            file = new File(System.getProperty("user.home"), appName + ".tmp");
-            channel = new RandomAccessFile(file, "rw").getChannel();
-
-            try {
-                lock = channel.tryLock();// check for the lock
-            } catch (final OverlappingFileLockException e) {
-                // already locked
-                closeLock();
-                return true;
-            }
-
-            if (lock == null) {
-                closeLock();
-                return true;
-            }
-
-            Runtime.getRuntime().addShutdownHook(new Thread() {
-                // destroy the lock when the JVM is closing
-                @Override
-                public void run() {
-                    closeLock();
-                    deleteFile();
-                }
-            });
-            return false;
-        } catch (final Exception e) {
-            closeLock();// error setting up the lock
-            return true;
-        }
     }
 
     /**
@@ -88,6 +50,44 @@ public class SingleInstance {
         try {
             file.delete();
         } catch (final Exception e) {
+        }
+    }
+
+    /**
+     * Check if the application is running with an instance of this class.
+     *
+     * @return True if the application is running; otherwise false.
+     */
+    public boolean isAppActive() {
+        try {
+            file = new File(System.getProperty("user.home"), appName + ".tmp");
+            channel = new RandomAccessFile(file, "rw").getChannel();
+
+            try {
+                lock = channel.tryLock();// check for the lock
+            } catch (final OverlappingFileLockException e) {
+                // already locked
+                this.closeLock();
+                return true;
+            }
+
+            if (lock == null) {
+                this.closeLock();
+                return true;
+            }
+
+            Runtime.getRuntime().addShutdownHook(new Thread() {
+                // destroy the lock when the JVM is closing
+                @Override
+                public void run() {
+                    SingleInstance.this.closeLock();
+                    SingleInstance.this.deleteFile();
+                }
+            });
+            return false;
+        } catch (final Exception e) {
+            this.closeLock();// error setting up the lock
+            return true;
         }
     }
 

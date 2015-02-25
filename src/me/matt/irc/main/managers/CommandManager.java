@@ -11,9 +11,9 @@ import me.matt.irc.main.wrappers.IRCChannel;
 
 /**
  * This class manages all of the plugins commands.
- * 
+ *
  * @author matthewlanglois
- * 
+ *
  */
 public class CommandManager {
 
@@ -29,7 +29,7 @@ public class CommandManager {
 
     /**
      * Executes a command ran through IRC.
-     * 
+     *
      * @param sender
      *            The user that sent the command.
      * @param msg

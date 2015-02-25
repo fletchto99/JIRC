@@ -10,9 +10,9 @@ import me.matt.irc.main.util.Methods;
 
 /**
  * Creates a text pane that holds text in order at the new line charcter.
- * 
+ *
  * @author matthewlanglois
- * 
+ *
  */
 public class OrderedTextPane extends JTextPane {
 
@@ -22,7 +22,7 @@ public class OrderedTextPane extends JTextPane {
 
     /**
      * Adds a message to the document.
-     * 
+     *
      * @param message
      *            The message to append.
      */
@@ -30,7 +30,7 @@ public class OrderedTextPane extends JTextPane {
         try {
             text.add(message);
             Collections.sort(text);
-            refresh();
+            this.refresh();
         } catch (final Exception e) {
             Methods.debug(e);
         }
@@ -38,7 +38,27 @@ public class OrderedTextPane extends JTextPane {
 
     /**
      * Removes a string from the document.
-     * 
+     *
+     * @param message
+     *            The text to remove.
+     */
+    private void refresh() {
+        try {
+            this.setText("");
+            for (final String s : text) {
+                if (!this.getText().equals("")) {
+                    this.setText(this.getText() + "\n");
+                }
+                this.setText(this.getText() + s);
+            }
+        } catch (final Exception e) {
+            Methods.debug(e);
+        }
+    }
+
+    /**
+     * Removes a string from the document.
+     *
      * @param message
      *            The text to remove.
      */
@@ -48,27 +68,7 @@ public class OrderedTextPane extends JTextPane {
                 text.remove(message);
             }
             Collections.sort(text);
-            refresh();
-        } catch (final Exception e) {
-            Methods.debug(e);
-        }
-    }
-
-    /**
-     * Removes a string from the document.
-     * 
-     * @param message
-     *            The text to remove.
-     */
-    private void refresh() {
-        try {
-            setText("");
-            for (final String s : text) {
-                if (!getText().equals("")) {
-                    setText(getText() + "\n");
-                }
-                setText(getText() + s);
-            }
+            this.refresh();
         } catch (final Exception e) {
             Methods.debug(e);
         }

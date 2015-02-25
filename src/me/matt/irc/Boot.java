@@ -12,14 +12,14 @@ import me.matt.irc.main.Configuration;
 
 /**
  * The main Boot class generated with the mainfest.
- * 
+ *
  * @author matthewlanglois
- * 
+ *
  */
 public class Boot {
 
     /**
-     * 
+     *
      * @param args
      *            The arguments to run the program with.
      * @throws ClassNotFoundException

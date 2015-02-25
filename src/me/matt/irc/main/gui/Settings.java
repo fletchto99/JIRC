@@ -18,23 +18,13 @@ import me.matt.irc.main.locale.Messages;
 
 /**
  * This class contains all of the options to change in the program.
- * 
+ *
  * @author matthewlanglois
- * 
+ *
  */
 public class Settings extends JPopupMenu {
 
     private static final long serialVersionUID = 1555391213470686686L;
-
-    /**
-     * Create an instance of the settings class.
-     * 
-     * @param parent
-     *            The parent to add the settings to.
-     */
-    public Settings(final ChannelToolBar parent) {
-        init(parent);
-    }
 
     JMenuItem add = new JMenuItem(Messages.JOINCHANNEL);
 
@@ -57,26 +47,26 @@ public class Settings extends JPopupMenu {
     JMenuItem exit = new JMenuItem(Messages.EXIT);
 
     /**
+     * Create an instance of the settings class.
+     *
+     * @param parent
+     *            The parent to add the settings to.
+     */
+    public Settings(final ChannelToolBar parent) {
+        this.init(parent);
+    }
+
+    /**
      * Create the settings button.
-     * 
+     *
      * @param parent
      *            The parent to add the settings to.
      */
     private void init(final ChannelToolBar parent) {
-        exit.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(final ActionEvent e) {
-                Application.getInstance().disable();
-            }
-        });
-        about.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(final ActionEvent e) {
-                JOptionPane.showMessageDialog(null,
-                        Messages.ABOUT_MESSAGE + "\n                      v: "
-                                + Configuration.getVersion());
-            }
-        });
+        exit.addActionListener(e -> Application.getInstance().disable());
+        about.addActionListener(e -> JOptionPane.showMessageDialog(null,
+                Messages.ABOUT_MESSAGE + "\n                      v: "
+                        + Configuration.getVersion()));
         add.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(final ActionEvent e) {
@@ -97,14 +87,11 @@ public class Settings extends JPopupMenu {
                                 + parent.getCurrentTab()));
             }
         });
-        debug.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(final ActionEvent e) {
-                if (!LoadScreen.getDebugger().isVisible()) {
-                    LoadScreen.getDebugger().setVisible(true);
-                } else {
-                    LoadScreen.getDebugger().setVisible(true);
-                }
+        debug.addActionListener(e -> {
+            if (!LoadScreen.getDebugger().isVisible()) {
+                LoadScreen.getDebugger().setVisible(true);
+            } else {
+                LoadScreen.getDebugger().setVisible(true);
             }
         });
         try {
@@ -126,34 +113,19 @@ public class Settings extends JPopupMenu {
         } catch (final MalformedURLException e) {
         }
 
-        eng.addActionListener(new ActionListener() {
-
-            @Override
-            public void actionPerformed(final ActionEvent arg0) {
-                Messages.setLanguage(Language.ENGLISH);
-                Application.getInstance().getTray().update();
-            }
-
+        eng.addActionListener(arg0 -> {
+            Messages.setLanguage(Language.ENGLISH);
+            Application.getInstance().getTray().update();
         });
 
-        fr.addActionListener(new ActionListener() {
-
-            @Override
-            public void actionPerformed(final ActionEvent arg0) {
-                Messages.setLanguage(Language.FRENCH);
-                Application.getInstance().getTray().update();
-            }
-
+        fr.addActionListener(arg0 -> {
+            Messages.setLanguage(Language.FRENCH);
+            Application.getInstance().getTray().update();
         });
 
-        sp.addActionListener(new ActionListener() {
-
-            @Override
-            public void actionPerformed(final ActionEvent arg0) {
-                Messages.setLanguage(Language.SPANISH);
-                Application.getInstance().getTray().update();
-            }
-
+        sp.addActionListener(arg0 -> {
+            Messages.setLanguage(Language.SPANISH);
+            Application.getInstance().getTray().update();
         });
 
         if (eng.getText().equalsIgnoreCase(Messages.CURR)) {
@@ -180,16 +152,16 @@ public class Settings extends JPopupMenu {
         language.add(sp);
 
         // add all of the menu items
-        add(add);
-        add(part);
-        add(reload);
-        addSeparator();
-        add(language);
-        addSeparator();
-        add(debug);
-        add(about);
-        addSeparator();
-        add(exit);
-        pack();
+        this.add(add);
+        this.add(part);
+        this.add(reload);
+        this.addSeparator();
+        this.add(language);
+        this.addSeparator();
+        this.add(debug);
+        this.add(about);
+        this.addSeparator();
+        this.add(exit);
+        this.pack();
     }
 }

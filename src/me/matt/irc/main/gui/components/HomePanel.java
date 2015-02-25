@@ -26,19 +26,35 @@ public class HomePanel extends JPanel {
      */
     private static final long serialVersionUID = -1392049773335849422L;
 
+    // Variables
+    private JTextField messageField;
+
+    private AutoScrollPane chatScrollPane;
+
+    private ColoredTextPane chatTextPane;
+
     /**
      * Create an instance of the HomePanel.
-     * 
+     *
      * @param parent
      *            The parent GUI.
      */
     public HomePanel(final Chrome parent) {
-        init(parent);
+        this.init(parent);
+    }
+
+    /**
+     * The message area.
+     *
+     * @return The message area.
+     */
+    public ColoredTextPane getMessageArea() {
+        return chatTextPane;
     }
 
     /**
      * Initilize the HomePannel
-     * 
+     *
      * @param parent
      *            The parent to add the homepannel to.
      */
@@ -46,7 +62,7 @@ public class HomePanel extends JPanel {
         messageField = new JTextField();
         chatTextPane = new ColoredTextPane();
         chatScrollPane = new AutoScrollPane(chatTextPane);
-        setLayout(null);
+        this.setLayout(null);
         messageField.setBounds(5, 480, 705, 30);
         {
             chatScrollPane
@@ -65,13 +81,11 @@ public class HomePanel extends JPanel {
             public void keyReleased(final KeyEvent e) {
                 if (e.isControlDown()) {
                     if (e.getKeyCode() == 75) {
-                        SwingUtilities.invokeLater(new Runnable() {
-                            public void run() {
-                                JDialog.setDefaultLookAndFeelDecorated(false);
-                                new SimpleColorChooser(new Point(messageField
-                                        .getLocationOnScreen().x, messageField
-                                        .getLocationOnScreen().y), messageField);
-                            }
+                        SwingUtilities.invokeLater(() -> {
+                            JDialog.setDefaultLookAndFeelDecorated(false);
+                            new SimpleColorChooser(new Point(messageField
+                                    .getLocationOnScreen().x, messageField
+                                    .getLocationOnScreen().y), messageField);
                         });
                     } else if (e.getKeyCode() == 66) {
                         messageField.setText(messageField.getText()
@@ -107,7 +121,7 @@ public class HomePanel extends JPanel {
             @Override
             public void insertString(final int offs, final String str,
                     final AttributeSet a) throws BadLocationException {
-                if ((getLength() + str.length()) <= 512) {
+                if ((this.getLength() + str.length()) <= 512) {
                     super.insertString(offs, str, a);
                 } else {
                     Beeper.beep();
@@ -115,22 +129,8 @@ public class HomePanel extends JPanel {
             }
         });
 
-        add(messageField, BorderLayout.SOUTH);
-        add(chatScrollPane, BorderLayout.NORTH);
+        this.add(messageField, BorderLayout.SOUTH);
+        this.add(chatScrollPane, BorderLayout.NORTH);
     }
-
-    /**
-     * The message area.
-     * 
-     * @return The message area.
-     */
-    public ColoredTextPane getMessageArea() {
-        return chatTextPane;
-    }
-
-    // Variables
-    private JTextField messageField;
-    private AutoScrollPane chatScrollPane;
-    private ColoredTextPane chatTextPane;
 
 }

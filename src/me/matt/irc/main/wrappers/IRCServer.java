@@ -2,9 +2,9 @@ package me.matt.irc.main.wrappers;
 
 /**
  * This class creates an IRCServer to connect to.
- * 
+ *
  * @author fletch_to_99 <fletchto99@hotmail.com>
- * 
+ *
  */
 public class IRCServer {
 
@@ -16,7 +16,7 @@ public class IRCServer {
 
     /**
      * The IRCServer wrapper.
-     * 
+     *
      * @param server
      *            The servers ip.
      * @param port
@@ -38,26 +38,8 @@ public class IRCServer {
     }
 
     /**
-     * Fetches the servers address.
-     * 
-     * @return The servers address.
-     */
-    public String getServer() {
-        return server;
-    }
-
-    /**
-     * Fetches the servers port.
-     * 
-     * @return The servers port.
-     */
-    public int getPort() {
-        return port;
-    }
-
-    /**
      * Fetches the users nick name.
-     * 
+     *
      * @return The users nick name.
      */
     public String getNick() {
@@ -66,7 +48,7 @@ public class IRCServer {
 
     /**
      * Fetches the users password.
-     * 
+     *
      * @return The users password.
      */
     public String getNickservPassword() {
@@ -74,8 +56,26 @@ public class IRCServer {
     }
 
     /**
+     * Fetches the servers port.
+     *
+     * @return The servers port.
+     */
+    public int getPort() {
+        return port;
+    }
+
+    /**
+     * Fetches the servers address.
+     *
+     * @return The servers address.
+     */
+    public String getServer() {
+        return server;
+    }
+
+    /**
      * Checks if the user is identifying with nickserv.
-     * 
+     *
      * @return True if the user is identifying with nickserv; otherwise false.
      */
     public boolean isIdentifing() {

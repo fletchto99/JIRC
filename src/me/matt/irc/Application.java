@@ -10,17 +10,24 @@ import me.matt.irc.main.gui.LoadScreen;
 
 /**
  * The main application. Executed via the Boot class.
- * 
+ *
  * @author matthewlanglois
- * 
+ *
  */
 public class Application {
 
-    private static IRC instance; // The currently running instance.
+    /**
+     * Fetches the instance of IRC.
+     *
+     * @return The current instance of IRC.
+     */
+    public static IRC getInstance() {
+        return Application.instance;
+    }
 
     /**
      * The main void that will be executed when the program is ran.
-     * 
+     *
      * @param args
      *            The arguments to pass to the program.
      */
@@ -35,33 +42,30 @@ public class Application {
         LoadScreen
                 .showDialog(param.toString().contains("-nosingleinstance") ? true
                         : false);
-        SwingUtilities.invokeLater(new Runnable() {
-            @Override
-            public void run() {
-                try {
-                    // execute the program in its own thread for stability.
-                    // Passing the required parameters.
-                    instance = new IRC(param.toString());
-                } catch (final Exception e) {
-                }
+        SwingUtilities.invokeLater(() -> {
+            try {
+                // execute the program in its own thread for stability.
+                // Passing the required parameters.
+                Application.instance = new IRC(param.toString());
+            } catch (final Exception e) {
             }
         });
     }
 
     /**
      * Reboot the program once the dependancies are successfully extracted.
-     * 
+     *
      * @throws IOException
      *             Invalid file location.
      */
     public static void reboot() throws IOException {
-        reboot(Boot.class.getProtectionDomain().getCodeSource().getLocation()
-                .getPath());
+        Application.reboot(Boot.class.getProtectionDomain().getCodeSource()
+                .getLocation().getPath());
     }
 
     /**
      * Reboot the program once the dependancies are successfully extracted.
-     * 
+     *
      * @throws IOException
      *             Invalid file location.
      */
@@ -86,13 +90,6 @@ public class Application {
         Runtime.getRuntime().exec(param.toString());
     }
 
-    /**
-     * Fetches the instance of IRC.
-     * 
-     * @return The current instance of IRC.
-     */
-    public static IRC getInstance() {
-        return instance;
-    }
+    private static IRC instance; // The currently running instance.
 
 }

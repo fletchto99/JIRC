@@ -28,9 +28,9 @@ import me.matt.irc.main.wrappers.IRCServer;
 
 /**
  * This handles all of the IRC related stuff.
- * 
+ *
  * @author matthewlangloiss
- * 
+ *
  */
 public class IRCHandler {
 
@@ -43,208 +43,54 @@ public class IRCHandler {
     private boolean connected = false;
 
     /**
-     * Connects to an IRC server then a channel.
-     * 
-     * @param server
-     *            The server to connect to.
-     * @return True if connected successfully; otherwise false.
-     */
-    public boolean connect(final IRCServer server) {
-        Methods.sendHomeMessage("Attempting to connect");
-        if (connection != null) {
-            if (connection.isConnected()) {
-                // check for a current connection
-                Methods.sendHomeMessage("Attempting to disconnect before re-connecting!");
-                disconnect(server);
-            }
-        }
-        connection = null;
-        connection = new Socket(); // init the socket
-        InetAddress addr;
-        try {
-            addr = InetAddress.getByName(server.getServer());
-            final SocketAddress sockaddr = new InetSocketAddress(addr,
-                    server.getPort());// connect to the socket on the port
-            connection.connect(sockaddr);
-        } catch (final UnknownHostException error) {
-            Methods.debug(error);
-        } catch (final ConnectException e) {
-            Methods.sendHomeMessage("The irc server may be down or you network provider blocks connections on this port/ip.");
-        } catch (final IOException e) {
-            Methods.debug(e);
-        }
-        String line = null;
-        if (connection.isConnected()) {
-            try {
-                writer = new BufferedWriter(new OutputStreamWriter(
-                        connection.getOutputStream()));
-                reader = new BufferedReader(new InputStreamReader(
-                        connection.getInputStream()));
-                Methods.sendHomeMessage("Attempting to connect to chat.");
-                writer.write("NICK " + server.getNick() + "\r\n");
-                writer.flush();
-                writer.write("USER " + server.getNick() + " 8 * :"
-                        + Configuration.Paths.Resources.VERSION + "\r\n");
-                writer.flush();
-                Methods.sendHomeMessage("Processing connection....");
-                while ((line = reader.readLine()) != null) {
-                    Methods.debug(Level.WARNING, line);
-                    if (line.contains("004") || line.contains("376")) {
-                        // The line the server sends once connected successfully
-                        break;
-                    } else if (line.contains("433")) {
-                        // send the server our nickname and begin the 30 second
-                        // ident timer (if identifing)
-                        if (!server.isIdentifing()) {
-                            Methods.sendHomeMessage("Your nickname is already in use, please switch it");
-                            Methods.sendHomeMessage("using \"nick [NAME]\" and try to connect again.");
-                            disconnect(server);
-                            return false;
-                        } else {
-                            // send the ghost/kill command if the nick is in use
-                            // and you own the account
-                            Methods.log("Sending ghost command....");
-                            writer.write("NICKSERV GHOST " + server.getNick()
-                                    + " " + server.getNickservPassword()
-                                    + "\r\n");
-                            writer.flush();
-                            continue;
-                        }
-                        // check to see if the server pings us within the time
-                        // of connecting
-                    } else if (line.toLowerCase().startsWith("ping ")) {
-                        writer.write("PONG " + line.substring(5) + "\r\n");
-                        writer.flush();
-                        continue;
-                    }
-                }
-                if (server.isIdentifing()) {
-                    Methods.sendHomeMessage("Identifying with Nickserv....");
-                    writer.write("NICKSERV IDENTIFY "
-                            + server.getNickservPassword() + "\r\n");
-                    writer.flush();
-                }
-                // set up the continous threads
-                // they will exit when the jvm exits or when they are manually
-                // killed within the program
-                watch = new Thread(KEEP_ALIVE);
-                watch.setDaemon(true);
-                watch.setPriority(Thread.MAX_PRIORITY);
-                watch.start();
-                print = new Thread(DISPATCH);
-                print.setDaemon(true);
-                print.setPriority(Thread.MAX_PRIORITY);
-                print.start();
-                connected = true;
-            } catch (final Exception e) {
-                Methods.sendHomeMessage("Failed to connect to IRC! Try again in about 1 minute!");
-                disconnect(server);
-            }
-        } else {
-            Methods.sendHomeMessage("There was an error when trying to connect to the IRC server");
-            return false;
-        }
-        return isConnected(server);
-    }
-
-    /**
-     * Disconnects a user from the IRC server.
-     * 
-     * @return True if we disconnect successfully; otherwise false.
-     */
-    public boolean disconnect(final IRCServer server) {
-        if (isConnected(server)) {
-            try {
-                if (watch != null) {
-                    watch.interrupt();
-                    watch = null;
-                }
-                if (print != null) {
-                    print.interrupt();
-                    print = null;
-                }
-                if (!connection.isClosed()) { // properly close the connection.
-                    Methods.sendHomeMessage("Closing connection.");
-                    connection.shutdownInput();
-                    connection.shutdownOutput();
-                    if (writer != null) {
-                        writer.flush();
-                        writer.close();
-                        writer = null;
-                    }
-                    connection.close();
-                    connection = null;
-                }
-                messageQueue.clear(); // clear the message queue, no need to
-                                      // keep old messages!
-                Methods.sendHomeMessage("Successfully disconnected from IRC.");
-            } catch (final Exception e) {
-                connection = null;
-                messageQueue.clear();// still clear the queue
-                Methods.sendHomeMessage("Successfully disconnected from IRC.");
-            }
-        }
-        connected = false;
-        return !isConnected(server);
-    }
-
-    /**
-     * Checks if the user is connected to an IRC server.
-     * 
-     * @return True if conencted to an IRC server; othewise false.
-     */
-    public boolean isConnected(final IRCServer server) {
-        if (connection != null) {
-            return connection.isConnected() && connected
-                    && !connection.isClosed();
-        }
-        return false;
-    }
-
-    /**
-     * Joins an IRC channel on that server.
-     * 
-     * @param channel
-     *            The channel to join.
-     */
-    public void join(final IRCChannel channel) {
-        if (channel.getPassword() != null && channel.getPassword() != "") {
-            final String pass = "JOIN " + channel.getChannel() + " "
-                    + channel.getPassword();
-            messageQueue.add(pass);
-        } else {
-            final String nopass = "JOIN " + channel.getChannel();
-            messageQueue.add(nopass);
-        }
-    }
-
-    /**
-     * Quits a channel in the IRC
-     * 
-     * @param channel
-     *            The channel to leave.
-     * @throws IOException
-     */
-    public void part(final IRCChannel channel) {
-        try {
-            // part from 'x' channel
-            if (isConnected(Application.getInstance().getConnectedServer())) {
-                writer.write("PART " + channel.getChannel() + "\r\n");
-                writer.flush();
-            }
-        } catch (final IOException e) {
-            Methods.debug(e);
-        }
-    }
-
-    /**
      * Keep the connection alive and scan for messages. TODO: clean this up
      */
     private final Runnable KEEP_ALIVE = new Runnable() {
+        private final byte ctcpControl = 1;
+
+        /**
+         * Fetch the CTCP message
+         *
+         * @param input
+         *            The line to scan.
+         * @return The ctcp message stripped.
+         */
+        private String getCTCPMessage(final String input) {
+            if (input.length() != 0) {
+                final String message = input
+                        .substring(input.indexOf(":", 1) + 1);
+                return message.substring(
+                        message.indexOf((char) ctcpControl) + 1,
+                        message.indexOf((char) ctcpControl, 1));
+            }
+            return null;
+        }
+
+        /**
+         * Check for Client to Client messages within the line,
+         *
+         * @param input
+         *            The line recieved.
+         * @return True if the message is CTCP; otherwise false.
+         */
+        private boolean isCTCP(final String input) {
+            if (input.length() != 0) {
+                final String message = input
+                        .substring(input.indexOf(":", 1) + 1);
+                if (message.length() != 0) {
+                    final char[] messageArray = message.toCharArray();
+                    return ((byte) messageArray[0]) == 1
+                            && ((byte) messageArray[messageArray.length - 1]) == 1;
+                }
+            }
+            return false;
+        }
+
+        @Override
         public void run() {
             try {
-                if (isConnected(Application.getInstance().getConnectedServer())
-                        && reader != null) {
+                if (IRCHandler.this.isConnected(Application.getInstance()
+                        .getConnectedServer()) && reader != null) {
                     String line;
                     while ((line = reader.readLine()) != null) {
                         Methods.debug(Level.WARNING, line);// debug all lines
@@ -256,10 +102,10 @@ public class IRCHandler {
                                     "PONG " + line.substring(5));
                             continue;
                             // check for Client to Client protocall messages
-                        } else if (isCTCP(line)) {
+                        } else if (this.isCTCP(line)) {
                             final String _name = line.substring(1,
                                     line.indexOf("!"));
-                            final String ctcpMsg = getCTCPMessage(line)
+                            final String ctcpMsg = this.getCTCPMessage(line)
                                     .toUpperCase();
                             if (ctcpMsg.equals("VERSION")) {
                                 writer.write("NOTICE " + _name + " :"
@@ -532,88 +378,327 @@ public class IRCHandler {
                 }
             }
         }
-
-        private final byte ctcpControl = 1;
-
-        /**
-         * Check for Client to Client messages within the line,
-         * 
-         * @param input
-         *            The line recieved.
-         * @return True if the message is CTCP; otherwise false.
-         */
-        private boolean isCTCP(final String input) {
-            if (input.length() != 0) {
-                final String message = input
-                        .substring(input.indexOf(":", 1) + 1);
-                if (message.length() != 0) {
-                    final char[] messageArray = message.toCharArray();
-                    return ((byte) messageArray[0]) == 1
-                            && ((byte) messageArray[messageArray.length - 1]) == 1;
-                }
-            }
-            return false;
-        }
-
-        /**
-         * Fetch the CTCP message
-         * 
-         * @param input
-         *            The line to scan.
-         * @return The ctcp message stripped.
-         */
-        private String getCTCPMessage(final String input) {
-            if (input.length() != 0) {
-                final String message = input
-                        .substring(input.indexOf(":", 1) + 1);
-                return message.substring(
-                        message.indexOf((char) ctcpControl) + 1,
-                        message.indexOf((char) ctcpControl, 1));
-            }
-            return null;
-        }
     };
 
     /**
      * Send all messages on a seprate thread.
      */
-    private final Runnable DISPATCH = new Runnable() {
-        public void run() {
-            while (true) {
-                try {
-                    int i = 0;
-                    if (isConnected(Application.getInstance()
-                            .getConnectedServer())) {
-                        while (!messageQueue.isEmpty()) {// scan the message
-                                                         // queue
-                            final String message = messageQueue.remove();// the first
-                            // element
-                            // in the
-                            // queue
-                            writer.write(message + "\r\n");
-                            writer.flush();
-                            i++;
-                            if (i >= 3) {// exit when more than three messages
-                                         // were sent
-                                break;
-                            }
-                            if (messageQueue.isEmpty()) {
-                                break;
-                            }
+    private final Runnable DISPATCH = () -> {
+        while (true) {
+            try {
+                int i = 0;
+                if (IRCHandler.this.isConnected(Application.getInstance()
+                        .getConnectedServer())) {
+                    while (!messageQueue.isEmpty()) {// scan the message
+                                                     // queue
+                        final String message = messageQueue.remove();// the first
+                        // element
+                        // in the
+                        // queue
+                        writer.write(message + "\r\n");
+                        writer.flush();
+                        i++;
+                        if (i >= 3) {// exit when more than three messages
+                                     // were sent
+                            break;
                         }
-                        Thread.sleep(1000);
+                        if (messageQueue.isEmpty()) {
+                            break;
+                        }
                     }
-                } catch (final Exception ex) {
-                    Thread.currentThread().interrupt();// how did we get this???
-                    break;
+                    Thread.sleep(1000);
                 }
+            } catch (final Exception ex) {
+                Thread.currentThread().interrupt();// how did we get this???
+                break;
             }
         }
     };
 
     /**
+     * Bans a user from the IRC channel if the bot is OP.
+     *
+     * @param Nick
+     *            The user to ban.
+     * @param channel
+     *            The channel to ban in.
+     * @param server
+     *            The server to kick the client from
+     * @param reason
+     *            Their ban reason.
+     */
+    public void ban(final IRCServer server, final String nick,
+            final String channel, final String reason) {
+        if (this.isConnected(server)) {
+            try {
+                this.kick(server, nick, channel, reason);
+                writer.write("MODE " + channel + " +b " + nick + "\r\n");
+                writer.flush();
+            } catch (final IOException e) {
+                Methods.debug(e);
+            }
+        }
+    }
+
+    /**
+     * Changes the nickname of the IRC bot.
+     *
+     * @param server
+     *            The server we are connected to
+     * @param Nick
+     *            The name to change to.
+     */
+    public void changeNick(final IRCServer server, final String Nick) {
+        if (this.isConnected(server)) {
+            try {
+                writer.write("NICK " + Nick + "\r\n");
+                writer.flush();
+            } catch (final IOException e) {
+                Methods.debug(e);
+            }
+        }
+    }
+
+    /**
+     * Connects to an IRC server then a channel.
+     *
+     * @param server
+     *            The server to connect to.
+     * @return True if connected successfully; otherwise false.
+     */
+    public boolean connect(final IRCServer server) {
+        Methods.sendHomeMessage("Attempting to connect");
+        if (connection != null) {
+            if (connection.isConnected()) {
+                // check for a current connection
+                Methods.sendHomeMessage("Attempting to disconnect before re-connecting!");
+                this.disconnect(server);
+            }
+        }
+        connection = null;
+        connection = new Socket(); // init the socket
+        InetAddress addr;
+        try {
+            addr = InetAddress.getByName(server.getServer());
+            final SocketAddress sockaddr = new InetSocketAddress(addr,
+                    server.getPort());// connect to the socket on the port
+            connection.connect(sockaddr);
+        } catch (final UnknownHostException error) {
+            Methods.debug(error);
+        } catch (final ConnectException e) {
+            Methods.sendHomeMessage("The irc server may be down or you network provider blocks connections on this port/ip.");
+        } catch (final IOException e) {
+            Methods.debug(e);
+        }
+        String line = null;
+        if (connection.isConnected()) {
+            try {
+                writer = new BufferedWriter(new OutputStreamWriter(
+                        connection.getOutputStream()));
+                reader = new BufferedReader(new InputStreamReader(
+                        connection.getInputStream()));
+                Methods.sendHomeMessage("Attempting to connect to chat.");
+                writer.write("NICK " + server.getNick() + "\r\n");
+                writer.flush();
+                writer.write("USER " + server.getNick() + " 8 * :"
+                        + Configuration.Paths.Resources.VERSION + "\r\n");
+                writer.flush();
+                Methods.sendHomeMessage("Processing connection....");
+                while ((line = reader.readLine()) != null) {
+                    Methods.debug(Level.WARNING, line);
+                    if (line.contains("004") || line.contains("376")) {
+                        // The line the server sends once connected successfully
+                        break;
+                    } else if (line.contains("433")) {
+                        // send the server our nickname and begin the 30 second
+                        // ident timer (if identifing)
+                        if (!server.isIdentifing()) {
+                            Methods.sendHomeMessage("Your nickname is already in use, please switch it");
+                            Methods.sendHomeMessage("using \"nick [NAME]\" and try to connect again.");
+                            this.disconnect(server);
+                            return false;
+                        } else {
+                            // send the ghost/kill command if the nick is in use
+                            // and you own the account
+                            Methods.log("Sending ghost command....");
+                            writer.write("NICKSERV GHOST " + server.getNick()
+                                    + " " + server.getNickservPassword()
+                                    + "\r\n");
+                            writer.flush();
+                            continue;
+                        }
+                        // check to see if the server pings us within the time
+                        // of connecting
+                    } else if (line.toLowerCase().startsWith("ping ")) {
+                        writer.write("PONG " + line.substring(5) + "\r\n");
+                        writer.flush();
+                        continue;
+                    }
+                }
+                if (server.isIdentifing()) {
+                    Methods.sendHomeMessage("Identifying with Nickserv....");
+                    writer.write("NICKSERV IDENTIFY "
+                            + server.getNickservPassword() + "\r\n");
+                    writer.flush();
+                }
+                // set up the continous threads
+                // they will exit when the jvm exits or when they are manually
+                // killed within the program
+                watch = new Thread(KEEP_ALIVE);
+                watch.setDaemon(true);
+                watch.setPriority(Thread.MAX_PRIORITY);
+                watch.start();
+                print = new Thread(DISPATCH);
+                print.setDaemon(true);
+                print.setPriority(Thread.MAX_PRIORITY);
+                print.start();
+                connected = true;
+            } catch (final Exception e) {
+                Methods.sendHomeMessage("Failed to connect to IRC! Try again in about 1 minute!");
+                this.disconnect(server);
+            }
+        } else {
+            Methods.sendHomeMessage("There was an error when trying to connect to the IRC server");
+            return false;
+        }
+        return this.isConnected(server);
+    }
+
+    /**
+     * Disconnects a user from the IRC server.
+     *
+     * @return True if we disconnect successfully; otherwise false.
+     */
+    public boolean disconnect(final IRCServer server) {
+        if (this.isConnected(server)) {
+            try {
+                if (watch != null) {
+                    watch.interrupt();
+                    watch = null;
+                }
+                if (print != null) {
+                    print.interrupt();
+                    print = null;
+                }
+                if (!connection.isClosed()) { // properly close the connection.
+                    Methods.sendHomeMessage("Closing connection.");
+                    connection.shutdownInput();
+                    connection.shutdownOutput();
+                    if (writer != null) {
+                        writer.flush();
+                        writer.close();
+                        writer = null;
+                    }
+                    connection.close();
+                    connection = null;
+                }
+                messageQueue.clear(); // clear the message queue, no need to
+                                      // keep old messages!
+                Methods.sendHomeMessage("Successfully disconnected from IRC.");
+            } catch (final Exception e) {
+                connection = null;
+                messageQueue.clear();// still clear the queue
+                Methods.sendHomeMessage("Successfully disconnected from IRC.");
+            }
+        }
+        connected = false;
+        return !this.isConnected(server);
+    }
+
+    /**
+     * Checks if the user is connected to an IRC server.
+     *
+     * @return True if conencted to an IRC server; othewise false.
+     */
+    public boolean isConnected(final IRCServer server) {
+        if (connection != null) {
+            return connection.isConnected() && connected
+                    && !connection.isClosed();
+        }
+        return false;
+    }
+
+    /**
+     * Joins an IRC channel on that server.
+     *
+     * @param channel
+     *            The channel to join.
+     */
+    public void join(final IRCChannel channel) {
+        if (channel.getPassword() != null && channel.getPassword() != "") {
+            final String pass = "JOIN " + channel.getChannel() + " "
+                    + channel.getPassword();
+            messageQueue.add(pass);
+        } else {
+            final String nopass = "JOIN " + channel.getChannel();
+            messageQueue.add(nopass);
+        }
+    }
+
+    /**
+     * Bans a user from the IRC channel if the bot is OP.
+     *
+     * @param Nick
+     *            The user to kick.
+     * @param channel
+     *            The channel to ban in.
+     */
+    public void kick(final IRCServer server, final String Nick,
+            final String channel, final String reason) {
+        if (this.isConnected(server)) {
+            try {
+                writer.write("KICK " + channel + " " + Nick + " " + reason
+                        + "\r\n");
+                writer.flush();
+            } catch (final IOException e) {
+                Methods.debug(e);
+            }
+        }
+    }
+
+    /**
+     * Bans a user from the IRC channel if the bot is OP.
+     *
+     * @param Nick
+     *            The user to kick.
+     * @param channel
+     *            The channel to ban in.
+     */
+    public void mode(final IRCServer server, final String nick,
+            final String channel, final String mode) {
+        if (this.isConnected(server)) {
+            try {
+                writer.write("MODE " + channel + " " + mode + " " + nick
+                        + "\r\n");
+                writer.flush();
+            } catch (final IOException e) {
+                Methods.debug(e);
+            }
+        }
+    }
+
+    /**
+     * Quits a channel in the IRC
+     *
+     * @param channel
+     *            The channel to leave.
+     * @throws IOException
+     */
+    public void part(final IRCChannel channel) {
+        try {
+            // part from 'x' channel
+            if (this.isConnected(Application.getInstance().getConnectedServer())) {
+                writer.write("PART " + channel.getChannel() + "\r\n");
+                writer.flush();
+            }
+        } catch (final IOException e) {
+            Methods.debug(e);
+        }
+    }
+
+    /**
      * Sends a message to the specified channel.
-     * 
+     *
      * @param Message
      *            The message to send.
      * @param channel
@@ -632,23 +717,7 @@ public class IRCHandler {
 
     /**
      * Sends a message to the specified channel.
-     * 
-     * @param Message
-     *            The message to send.
-     * @param channel
-     *            The channel to send the message to.
-     */
-    public void sendRaw(final String RawMessage) {
-        final String parts[] = RawMessage.toString().split(
-                "(?<=\\G.{" + 500 + "})");
-        for (final String msg : parts) {
-            messageQueue.add(msg);// append to queue
-        }
-    }
-
-    /**
-     * Sends a message to the specified channel.
-     * 
+     *
      * @param Message
      *            The message to send.
      * @param channel
@@ -666,88 +735,18 @@ public class IRCHandler {
     }
 
     /**
-     * Changes the nickname of the IRC bot.
-     * 
-     * @param server
-     *            The server we are connected to
-     * @param Nick
-     *            The name to change to.
-     */
-    public void changeNick(final IRCServer server, final String Nick) {
-        if (isConnected(server)) {
-            try {
-                writer.write("NICK " + Nick + "\r\n");
-                writer.flush();
-            } catch (final IOException e) {
-                Methods.debug(e);
-            }
-        }
-    }
-
-    /**
-     * Bans a user from the IRC channel if the bot is OP.
-     * 
-     * @param Nick
-     *            The user to kick.
+     * Sends a message to the specified channel.
+     *
+     * @param Message
+     *            The message to send.
      * @param channel
-     *            The channel to ban in.
+     *            The channel to send the message to.
      */
-    public void kick(final IRCServer server, final String Nick,
-            final String channel, final String reason) {
-        if (isConnected(server)) {
-            try {
-                writer.write("KICK " + channel + " " + Nick + " " + reason
-                        + "\r\n");
-                writer.flush();
-            } catch (final IOException e) {
-                Methods.debug(e);
-            }
-        }
-    }
-
-    /**
-     * Bans a user from the IRC channel if the bot is OP.
-     * 
-     * @param Nick
-     *            The user to kick.
-     * @param channel
-     *            The channel to ban in.
-     */
-    public void mode(final IRCServer server, final String nick,
-            final String channel, final String mode) {
-        if (isConnected(server)) {
-            try {
-                writer.write("MODE " + channel + " " + mode + " " + nick
-                        + "\r\n");
-                writer.flush();
-            } catch (final IOException e) {
-                Methods.debug(e);
-            }
-        }
-    }
-
-    /**
-     * Bans a user from the IRC channel if the bot is OP.
-     * 
-     * @param Nick
-     *            The user to ban.
-     * @param channel
-     *            The channel to ban in.
-     * @param server
-     *            The server to kick the client from
-     * @param reason
-     *            Their ban reason.
-     */
-    public void ban(final IRCServer server, final String nick,
-            final String channel, final String reason) {
-        if (isConnected(server)) {
-            try {
-                kick(server, nick, channel, reason);
-                writer.write("MODE " + channel + " +b " + nick + "\r\n");
-                writer.flush();
-            } catch (final IOException e) {
-                Methods.debug(e);
-            }
+    public void sendRaw(final String RawMessage) {
+        final String parts[] = RawMessage.toString().split(
+                "(?<=\\G.{" + 500 + "})");
+        for (final String msg : parts) {
+            messageQueue.add(msg);// append to queue
         }
     }
 }

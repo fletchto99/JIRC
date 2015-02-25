@@ -15,11 +15,24 @@ public class Debugger extends JFrame {
 
     private static final long serialVersionUID = -7273108132881476625L;
 
+    private AutoScrollPane debugAS;
+
+    private ColoredTextPane debugTextArea;
+
     /**
      * Create a debugger that we can print information on.
      */
     public Debugger() {
-        init();
+        this.init();
+    }
+
+    /**
+     * Fetch the debug area.
+     *
+     * @return The debug area.
+     */
+    public ColoredTextPane getDebugArea() {
+        return debugTextArea;
     }
 
     /**
@@ -29,31 +42,20 @@ public class Debugger extends JFrame {
         debugTextArea = new ColoredTextPane();
         debugAS = new AutoScrollPane(debugTextArea);
 
-        setResizable(false);
-        setAlwaysOnTop(true);
-        setTitle("Debugger");
+        this.setResizable(false);
+        this.setAlwaysOnTop(true);
+        this.setTitle("Debugger");
 
-        setIconImage(ImageUtil.getImage(Configuration.Paths.Resources.ICON_BUG));
+        this.setIconImage(ImageUtil
+                .getImage(Configuration.Paths.Resources.ICON_BUG));
 
         debugTextArea.setEditable(false);
         debugAS.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
         debugAS.setViewportView(debugTextArea);
-        add(debugAS, BorderLayout.CENTER);
+        this.add(debugAS, BorderLayout.CENTER);
         debugAS.setBounds(0, 0, 400, 400);
 
-        setPreferredSize(new Dimension(400, 400));
-        setSize(400, 400);
-    }
-
-    private AutoScrollPane debugAS;
-    private ColoredTextPane debugTextArea;
-
-    /**
-     * Fetch the debug area.
-     * 
-     * @return The debug area.
-     */
-    public ColoredTextPane getDebugArea() {
-        return debugTextArea;
+        this.setPreferredSize(new Dimension(400, 400));
+        this.setSize(400, 400);
     }
 }

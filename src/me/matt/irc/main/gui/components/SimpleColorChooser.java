@@ -12,6 +12,7 @@ import javax.swing.ImageIcon;
 import javax.swing.JDialog;
 import javax.swing.JLabel;
 import javax.swing.JTextField;
+import javax.swing.WindowConstants;
 
 import me.matt.irc.Application;
 import me.matt.irc.main.Configuration;
@@ -21,7 +22,7 @@ import me.matt.irc.main.util.Methods;
 
 /**
  * Creates a color chooser for IRC formats.
- * 
+ *
  * @author matthewlanglois
  */
 public class SimpleColorChooser extends JDialog implements MouseListener {
@@ -34,7 +35,7 @@ public class SimpleColorChooser extends JDialog implements MouseListener {
 
     /**
      * Creates the color chooser.
-     * 
+     *
      * @param location
      *            The location to display the chooser.
      * @param parent
@@ -48,32 +49,43 @@ public class SimpleColorChooser extends JDialog implements MouseListener {
                     .getBufferedImage(Configuration.Paths.Resources.COLORS);
         } catch (final IOException e) {
             Methods.debug(e);
-            dispose();
+            this.dispose();
         }
         this.setLocation(location.x, location.y - splash.getHeight());
         this.getRootPane().setOpaque(false);
         this.setUndecorated(true);
         this.setAlwaysOnTop(true);
-        this.setDefaultCloseOperation(DISPOSE_ON_CLOSE);
+        this.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
         this.setTitle("ColorChoice");
         this.setModalityType(ModalityType.TOOLKIT_MODAL);
         this.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
         this.setSize(splash.getWidth(), splash.getHeight());
         final JLabel label = new JLabel();
         label.setIcon(new ImageIcon(splash));
-        add(label);
-        pack();
-        addMouseListener(this);
-        setVisible(true);
+        this.add(label);
+        this.pack();
+        this.addMouseListener(this);
+        this.setVisible(true);
         JDialog.setDefaultLookAndFeelDecorated(true);
     }
 
+    @Override
     public void mouseClicked(final MouseEvent e) {
     }
 
+    @Override
+    public void mouseEntered(final MouseEvent e) {
+    }
+
+    @Override
+    public void mouseExited(final MouseEvent e) {
+    }
+
+    @Override
     public void mousePressed(final MouseEvent e) {
     }
 
+    @Override
     public void mouseReleased(final MouseEvent e) {
         final Rectangle c1 = new Rectangle(6, 8, 17, 17);
         final Rectangle c2 = new Rectangle(28, 8, 17, 17);
@@ -93,62 +105,56 @@ public class SimpleColorChooser extends JDialog implements MouseListener {
         final Rectangle c16 = new Rectangle(154, 28, 17, 17);
         if (c1.contains(e.getPoint())) {
             parent.setText(parent.getText() + IRCModifier.WHITE.getModifier());
-            dispose();
+            this.dispose();
         } else if (c2.contains(e.getPoint())) {
             parent.setText(parent.getText() + IRCModifier.BLACK.getModifier());
-            dispose();
+            this.dispose();
         } else if (c3.contains(e.getPoint())) {
             parent.setText(parent.getText()
                     + IRCModifier.DARK_BLUE.getModifier());
-            dispose();
+            this.dispose();
         } else if (c4.contains(e.getPoint())) {
             parent.setText(parent.getText()
                     + IRCModifier.DARK_GREEN.getModifier());
-            dispose();
+            this.dispose();
         } else if (c5.contains(e.getPoint())) {
             parent.setText(parent.getText() + IRCModifier.RED.getModifier());
-            dispose();
+            this.dispose();
         } else if (c6.contains(e.getPoint())) {
             parent.setText(parent.getText() + IRCModifier.BROWN.getModifier());
-            dispose();
+            this.dispose();
         } else if (c7.contains(e.getPoint())) {
             parent.setText(parent.getText() + IRCModifier.PURPLE.getModifier());
-            dispose();
+            this.dispose();
         } else if (c8.contains(e.getPoint())) {
             parent.setText(parent.getText() + IRCModifier.OLIVE.getModifier());
-            dispose();
+            this.dispose();
         } else if (c9.contains(e.getPoint())) {
             parent.setText(parent.getText() + IRCModifier.YELLOW.getModifier());
-            dispose();
+            this.dispose();
         } else if (c10.contains(e.getPoint())) {
             parent.setText(parent.getText() + IRCModifier.GREEN.getModifier());
-            dispose();
+            this.dispose();
         } else if (c11.contains(e.getPoint())) {
             parent.setText(parent.getText() + IRCModifier.TEAL.getModifier());
-            dispose();
+            this.dispose();
         } else if (c12.contains(e.getPoint())) {
             parent.setText(parent.getText() + IRCModifier.CYAN.getModifier());
-            dispose();
+            this.dispose();
         } else if (c13.contains(e.getPoint())) {
             parent.setText(parent.getText() + IRCModifier.BLUE.getModifier());
-            dispose();
+            this.dispose();
         } else if (c14.contains(e.getPoint())) {
             parent.setText(parent.getText() + IRCModifier.MAGENTA.getModifier());
-            dispose();
+            this.dispose();
         } else if (c15.contains(e.getPoint())) {
             parent.setText(parent.getText()
                     + IRCModifier.DARK_GRAY.getModifier());
-            dispose();
+            this.dispose();
         } else if (c16.contains(e.getPoint())) {
             parent.setText(parent.getText()
                     + IRCModifier.LIGHT_GRAY.getModifier());
-            dispose();
+            this.dispose();
         }
-    }
-
-    public void mouseEntered(final MouseEvent e) {
-    }
-
-    public void mouseExited(final MouseEvent e) {
     }
 }

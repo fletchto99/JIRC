@@ -23,9 +23,9 @@ import me.matt.irc.main.wrappers.IRCChannel;
 
 /**
  * This contains the information of each channel joined and disaplays it on the screen.
- * 
+ *
  * @author matthewlanglois
- * 
+ *
  */
 public class ChannelPanel extends JComponent {
 
@@ -41,7 +41,7 @@ public class ChannelPanel extends JComponent {
 
     /**
      * Create a new channel panel.
-     * 
+     *
      * @param idx
      *            The index of the panel.
      * @param channel
@@ -50,7 +50,44 @@ public class ChannelPanel extends JComponent {
     public ChannelPanel(final int idx, final String channel) {
         this.channel = channel;
         this.idx = idx;
-        init();
+        this.init();
+    }
+
+    /**
+     * Adds a user to the users text pane.
+     *
+     * @param user
+     *            The user to add.
+     */
+    public void addUser(final String user) {
+        userTextArea.append(user);
+    }
+
+    /**
+     * Fetch the IRCChannel.
+     *
+     * @return The IRCChannel.
+     */
+    public String getChannel() {
+        return channel;
+    }
+
+    /**
+     * Fetch the index.
+     *
+     * @return The index of the panel.
+     */
+    public int getIndex() {
+        return idx;
+    }
+
+    /**
+     * Fetch the message area.
+     *
+     * @return The message area.
+     */
+    public ColoredTextPane getMessageArea() {
+        return chatTextArea;
     }
 
     /**
@@ -75,7 +112,7 @@ public class ChannelPanel extends JComponent {
             chatScrollPane.setViewportView(chatTextArea);
         }
 
-        add(chatScrollPane);
+        this.add(chatScrollPane);
         chatScrollPane.setBounds(5, 0, 585, 475);
         chatTextArea.setEditable(false);
 
@@ -94,14 +131,12 @@ public class ChannelPanel extends JComponent {
             @Override
             public void keyReleased(final KeyEvent e) {
                 if (e.isControlDown()) {
-                    if (e.getKeyCode() == 75) {
-                        SwingUtilities.invokeLater(new Runnable() {
-                            public void run() {
-                                JDialog.setDefaultLookAndFeelDecorated(false);
-                                new SimpleColorChooser(new Point(messageField
-                                        .getLocationOnScreen().x, messageField
-                                        .getLocationOnScreen().y), messageField);
-                            }
+                    if (e.getKeyCode() == KeyEvent.VK_K) {
+                        SwingUtilities.invokeLater(() -> {
+                            JDialog.setDefaultLookAndFeelDecorated(false);
+                            new SimpleColorChooser(new Point(messageField
+                                    .getLocationOnScreen().x, messageField
+                                    .getLocationOnScreen().y), messageField);
                         });
                     } else if (e.getKeyCode() == 66) {
                         messageField.setText(messageField.getText()
@@ -142,73 +177,36 @@ public class ChannelPanel extends JComponent {
             @Override
             public void insertString(final int offs, final String str,
                     final AttributeSet a) throws BadLocationException {
-                if ((getLength() + str.length()) <= 512) {
+                if ((this.getLength() + str.length()) <= 512) {
                     super.insertString(offs, str, a);
                 } else {
                     Beeper.beep();
                 }
             }
         });
-        add(messageField, BorderLayout.SOUTH);
-        add(chatScrollPane, BorderLayout.NORTH);
-        add(userScrollPane, BorderLayout.WEST);
-    }
-
-    /**
-     * Fetch the message area.
-     * 
-     * @return The message area.
-     */
-    public ColoredTextPane getMessageArea() {
-        return chatTextArea;
-    }
-
-    /**
-     * Fetch the index.
-     * 
-     * @return The index of the panel.
-     */
-    public int getIndex() {
-        return idx;
-    }
-
-    /**
-     * Fetch the IRCChannel.
-     * 
-     * @return The IRCChannel.
-     */
-    public String getChannel() {
-        return channel;
-    }
-
-    /**
-     * Set the index of the panel.
-     * 
-     * @param idx
-     *            The index to set the panel to.
-     */
-    public void setIndex(final int idx) {
-        this.idx = idx;
-    }
-
-    /**
-     * Adds a user to the users text pane.
-     * 
-     * @param user
-     *            The user to add.
-     */
-    public void addUser(final String user) {
-        userTextArea.append(user);
+        this.add(messageField, BorderLayout.SOUTH);
+        this.add(chatScrollPane, BorderLayout.NORTH);
+        this.add(userScrollPane, BorderLayout.WEST);
     }
 
     /**
      * Removes a user from the ordered text pane.
-     * 
+     *
      * @param user
      *            The user to remove.
      */
     public void removeUser(final String user) {
         userTextArea.remove(user);
+    }
+
+    /**
+     * Set the index of the panel.
+     *
+     * @param idx
+     *            The index to set the panel to.
+     */
+    public void setIndex(final int idx) {
+        this.idx = idx;
     }
 
 }

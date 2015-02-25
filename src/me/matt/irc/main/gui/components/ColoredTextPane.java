@@ -14,9 +14,9 @@ import me.matt.irc.main.util.Style;
 
 /**
  * Creates a text pane that can hold color.
- * 
+ *
  * @author matthewlanglois
- * 
+ *
  */
 public class ColoredTextPane extends JTextPane {
 
@@ -24,7 +24,7 @@ public class ColoredTextPane extends JTextPane {
 
     /**
      * Adds a message to the document.
-     * 
+     *
      * @param message
      *            The message to append.
      */
@@ -72,7 +72,7 @@ public class ColoredTextPane extends JTextPane {
                     buffer.add(ch);
                 }
             }
-            final Document doc = getDocument();
+            final Document doc = this.getDocument();
             final SimpleAttributeSet aset = new SimpleAttributeSet();
             for (final Object obj : buffer) {
                 if (obj instanceof Color) {

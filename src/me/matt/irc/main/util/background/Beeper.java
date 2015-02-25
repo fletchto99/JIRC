@@ -2,7 +2,7 @@ package me.matt.irc.main.util.background;
 
 /**
  * A class which provides a beeper system.
- * 
+ *
  * @author matthewlanglois
  */
 public class Beeper {

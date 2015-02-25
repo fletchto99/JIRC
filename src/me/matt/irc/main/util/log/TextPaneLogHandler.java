@@ -9,9 +9,9 @@ import me.matt.irc.main.util.IRCModifier;
 
 /**
  * This class is used to append logrecords to a TextPane.
- * 
+ *
  * @author matthewlanglois
- * 
+ *
  */
 public class TextPaneLogHandler extends Handler {
 
@@ -19,7 +19,7 @@ public class TextPaneLogHandler extends Handler {
 
     /**
      * Initilize the loghandler.
-     * 
+     *
      * @param parent
      *            The text pane parent.
      */
@@ -39,7 +39,7 @@ public class TextPaneLogHandler extends Handler {
 
     /**
      * Publish the records to the text parent.
-     * 
+     *
      * @param record
      *            The record to log.
      */

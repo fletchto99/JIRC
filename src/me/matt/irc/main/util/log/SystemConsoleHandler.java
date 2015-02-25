@@ -4,9 +4,9 @@ import java.util.logging.ConsoleHandler;
 
 /**
  * Log to system.
- * 
+ *
  * @author matthewlanglois
- * 
+ *
  */
 public class SystemConsoleHandler extends ConsoleHandler {
 
@@ -15,6 +15,6 @@ public class SystemConsoleHandler extends ConsoleHandler {
      */
     public SystemConsoleHandler() {
         super();
-        setOutputStream(System.out);
+        this.setOutputStream(System.out);
     }
 }

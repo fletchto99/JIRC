@@ -7,14 +7,14 @@ import java.io.Writer;
 
 /**
  * A string utility.
- * 
+ *
  * @author matthewlanglois
  */
 public class StringUtil {
 
     /**
      * Get the bytes of a UTF-8 encoded string.
-     * 
+     *
      * @param string
      *            The string to read the bytes from
      * @return The bytes of the string.
@@ -29,10 +29,10 @@ public class StringUtil {
 
     /**
      * Creates a valid UTF-8 String.
-     * 
+     *
      * @param bytes
      *            The bytes to write to the string.
-     * 
+     *
      * @return The UTF-8 encoded String.
      */
     public static String newStringUtf8(final byte[] bytes) {
@@ -48,7 +48,7 @@ public class StringUtil {
 
     /**
      * Throws an exteption to a string.
-     * 
+     *
      * @param t
      *            The exception thrown.
      * @return The exception stacktrace as a String.

@@ -1,2 +1,4 @@
-Wednesday August 1 2012 -- 16:24:12 -04:00
-   server started successfully
+Wednesday October 15 2014 -- 22:41:20 -04:00
+   Listen failed, :: 4400, unable to bind on address ::#4400, error 10048
+   Listen failed, :: 6667, unable to bind on address ::#6667, error 10048
+   unable to listen on any port.
